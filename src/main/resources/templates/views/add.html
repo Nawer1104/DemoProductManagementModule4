@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${pageTitle}]]</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-fluid" >
+    <div class="text-center">
+        <h2>[[${pageTitle}]]</h2>
+    </div>
+    <form th:action="@{/save}" method="post" th:object="${product}" style="max-width: 500px; margin: 0 auto" enctype="multipart/form-data">
+        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="alert alert-danger text-center"></div>
+        <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="alert alert-danger text-center"></div>
+        <div th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="alert alert-danger text-center"></div>
+        <input type="hidden" th:field="*{id}">
+        <div class="border border-secondary rounded p-3">
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Name:</label>
+                <div class="col-sm-8">
+                    <input type="text" th:field="*{name}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Price:</label>
+                <div class="col-sm-8">
+                    <input type="number" th:field="*{price}" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Quantity:</label>
+                <div class="col-sm-8">
+                    <input type="number" th:field="*{quantity}" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Image:</label>
+                <div class="col-sm-8">
+                    <input type="file" name="fileImage" id="fileImage" accept="image/*" class="form-control">
+                </div>
+            </div>
+            <input type="hidden" th:field="*{image}">
+            <div class="form-group row">
+                <div class="col-sm-8">
+                    <img th:src="${product.getImage() == null? '/images/default-bike-big.jpg' : product.getImagePath()}" id="thumbnail" alt="Product image preview" width="150" height="100">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Category:</label>
+                <div class="col-sm-8">
+                    <select name="category" th:feild="*{category}" class="form-control">
+                        <option th:each="cate : ${categories}" th:text="${cate.getName()}" th:value="${cate.getId()}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary m-2">Save</button>
+                <button type="button" class="btn btn-secondary m-2" onclick="cancelForm()">Cancel</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#fileImage').change(function () {
+            showImageThumbnail(this);
+        })
+    });
+
+    function showImageThumbnail(fileInput) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#thumbnail').attr('src', e.target.result)
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function cancelForm() {
+        window.location = "[[@{/products}]]";
+    }
+</script>
+</body>
+</html>

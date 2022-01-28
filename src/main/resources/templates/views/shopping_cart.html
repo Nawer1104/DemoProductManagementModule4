@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-fluid text-center" >
+    <div>
+        <form th:action="@{/logout}" method="post">
+            <p>
+                Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b>
+                <span sec:authentication="principal.authorities">Roles</span>
+            </p>
+            <input type="submit" value="Sign Out" class="btn btn-outline-success my-2 my-sm-0">
+        </form>
+    </div>
+    <div>
+        <a class="h2" href="/products">All Products Page!!!</a>
+    </div>
+    <div th:if="${mess}" class="alert alert-success text-center">
+        [[${mess}]]
+    </div>
+    <div class="row m-1" th:unless="${#lists.isEmpty(cartItemList)}">
+        <div class="col-sm-8">
+            <th:block th:each="item,loop : ${cartItemList}">
+                <div class="row border rounded">
+                    <div class="col-1">
+                        <div>[[${loop.count}]]</div>
+                        <div><a th:href="@{'/cart/remove/' + ${item.product.id}}">Remove</a></div>
+                    </div>
+                    <div class="col-6">
+                        <img th:src="@{${item.product.getImagePath()}}" alt="" class="img-fluid">
+                    </div>
+                    <div class="col">
+                        <div>
+                            <a href="/">
+                                <b>[[${item.product.name}]]</b>
+                            </a>
+                        </div>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item">
+                                    <a th:href="@{'/cart/update/' + ${item.product.id} +'/' + ${item.quantity - 1}}" class="page-link" ><b>-</b></a>
+                                </li>
+                                <li class="page-item">
+                                    <input type="text" th:value="${item.quantity}" class="form-control text-center" style="max-width: 55px" readonly>
+                                </li>
+                                <li class="page-item">
+                                    <a th:href="@{'/cart/update/' + ${item.product.id} +'/' + ${item.quantity + 1}}" class="page-link" ><b>+</b></a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div>
+                            <span>X</span>
+                            <span>$[[${item.product.price}]]</span>
+
+                        </div>
+                        <div>
+                            <span>=&nbsp;</span><span class="h4">$</span><span class="h4 productSubtotal">[[${item.getSubtotal()}]]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-1">&nbsp;</div>
+            </th:block>
+        </div>
+        <div class="col-sm-4">
+            <div>
+                <span class="h3">Estimated Total:</span>
+            </div>
+            <div class="mt-2">
+                <span class="h2" id="totalAmount"></span>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-danger p-3 mt-2">Check Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(cartItemList)}">
+        <h3>You have not chosen any products yet</h3>
+    </div>
+</div>
+</div>
+</body>
+<script>
+$(document).ready(function () {
+    updateTotal();
+});
+
+function updateTotal() {
+    total = 0.0;
+
+    $(".productSubtotal").each(function (index, element){
+        total = total + parseFloat(element.innerHTML);
+    })
+    $("#totalAmount").text("$" + total);
+}
+</script>
+</html>

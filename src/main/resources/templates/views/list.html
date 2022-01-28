@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+                 xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage User</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-fluid text-center" >
+    <div>
+        <form th:action="@{/logout}" method="post">
+              <p>
+                  Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b>
+                  <span sec:authentication="principal.authorities">Roles</span>
+              </p>
+            <input type="submit" value="Sign Out" class="btn btn-outline-success my-2 my-sm-0">
+        </form>
+    </div>
+    <div>
+        <a class="h2" href="/products">All Products Page!!!</a>
+    </div>
+    <div>
+        <a class="h2" href="/employees">All Employees Page!!!</a>
+    </div>
+    <div>
+        <a class="h2" href="/cart">Shopping Cart Page!!!</a>
+    </div>
+    <div class="m-2">
+        <a class="h3" th:href="@{/add}" style="text-decoration: none">Add New Product</a>
+        <br>
+        <a class="h3" th:href="@{/addCate}" style="text-decoration: none">Add New Category</a>
+        <form th:action="@{/page/{pageNumber}(pageNumber = ${currentPage})}" class="form-inline my-2 my-lg-0">
+            <input type="hidden" name="sortField" th:value="${sortField}">
+            <input type="hidden" name="sortDir" th:value="${sortDir}">
+            <input type="search" name="keyword" size="50" class="form-control mr-sm-2" placeholder="Search By Name Here..."/>
+            &nbsp
+            <input type="submit" value="Search" class="btn btn-outline-success my-2 my-sm-0">
+        </form>
+    </div>
+    <div>
+        <div th:if="${mess}" class="alert alert-success text-center">
+            [[${mess}]]
+        </div>
+        <div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>
+                        <a th:href="@{'/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir} + '&keyword=' + ${keyword}}">ID</a>
+                    </th>
+                    <th>Product's Name</th>
+                    <th>Product's Price</th>
+                    <th>Product's Quantity</th>
+                    <th>Product's Image</th>
+                    <th>
+                        <a th:href="@{'/page/' + ${currentPage} + '?sortField=category&sortDir=' + ${reverseSortDir} + '&keyword=' + ${keyword}}">Product's Category</a>
+                    </th>
+                    <th>Management</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="pro,loop : ${products}">
+                    <tr>
+                        <td>[[${loop.count}]]</td>
+                        <td>[[${pro.id}]]</td>
+                        <td>[[${pro.name}]]</td>
+                        <td>$[[${pro.price}]]</td>
+                        <td>[[${pro.quantity}]]</td>
+                        <td><img th:src="@{${pro.getImagePath()}}" alt="" width="150" height="100"></td>
+                        <td>[[${pro.category.name}]]</td>
+                        <td>
+                            <a class="btn btn-primary" th:href="@{'/cart/add/' + ${pro.id} +'/1'}" >Add to Cart</a>
+                            <a th:href="@{'/edit/' + ${pro.id}}" class="h4 mr-3">Edit</a>
+                            <a th:href="@{'/delete/' + ${pro.id}}" class="h4 mr-3">Delete</a>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            Total Items: [[${totalItems}]] - Page [[${currentPage}]] of [[${totalPages}]]
+            &nbsp
+            <a class="mr-2" th:if="${currentPage > 1}" th:href="@{'/page/1?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&keyword=' + ${keyword}}">First</a>
+            <span class="mr-2" th:if="${currentPage == 1}">First</span>
+            <a class="mr-2" th:if="${currentPage > 1}" th:href="@{'/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&keyword=' + ${keyword}}">Previous</a>
+            <span class="mr-2" th:if="${currentPage == 1}">Previous</span>
+            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                <a th:if="${i != currentPage}" th:href="@{'/page/' + ${i} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&keyword=' + ${keyword}}" class="mr-2">[[${i}]]</a>
+                <span th:if="${i == currentPage}" class="mr-2">[[${i}]]</span>
+            </span>
+            <a class="mr-2" th:if="${currentPage < totalPages}" th:href="@{'/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&keyword=' + ${keyword}}">Next</a>
+            <span class="mr-2" th:if="${currentPage == totalPages}">Next</span>
+            <a class="mr-2" th:if="${currentPage != totalPages}" th:href="@{'/page/' + ${totalPages}  + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&keyword=' + ${keyword}}">Last</a>
+            <span class="mr-2" th:if="${currentPage == totalPages}">Last</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>
